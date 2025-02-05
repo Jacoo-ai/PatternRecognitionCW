@@ -135,6 +135,11 @@ sgtitle('Normal Contact Force and Detected Peaks (9 Objects)');
 
 %% Part A 3
 % List of file paths
+% mat_files = {
+%     "Processed_data\Data_for_each_contact\cylinder_papillarray_single.mat", 
+%     "Processed_data\Data_for_each_contact\cylinder_rubber_papillarray_single.mat", 
+%     "Processed_data\Data_for_each_contact\cylinder_TPU_papillarray_single.mat", 
+% };
 mat_files = {
     "Processed_data\Data_for_each_contact\cylinder_papillarray_single.mat", 
     "Processed_data\Data_for_each_contact\cylinder_rubber_papillarray_single.mat", 
@@ -152,8 +157,8 @@ grid on;
 for i = 1:length(mat_files)
     data = load(mat_files{i});
     % Choose the papillae
-    forces = data.tactile_forces(:, 13:15);  % middle
-%     forces = data.tactile_forces(:, 1:3);  % corner
+    % forces = data.tactile_forces(:, 13:15);  % middle
+    forces = data.tactile_forces(:, 25:27);  % corner
     % Scatter plot for this cylinder
     scatter3(forces(:, 1), forces(:, 2), forces(:, 3), 50, colors{i}, 'filled'); 
 end
@@ -164,5 +169,6 @@ ylabel('Force in Y direction (N)');
 zlabel('Force in Z direction (N)');
 title('3D Scatter Plot of Tactile Forces');
 legend({'Normal', 'Rubber', 'TPU'}, 'Location', 'Best');
-view(3);
+% view(3);
+view(30,50);
 
