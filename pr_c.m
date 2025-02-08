@@ -138,77 +138,51 @@ mu_total = mean(X, 1);
 Sw = cov(X(y == 1, :)) + cov(X(y == 2, :));
 Sb = (mu1 - mu_total)' * (mu1 - mu_total) + (mu2 - mu_total)' * (mu2 - mu_total);
 
-% Calcualte eigenvalues and sort
+% Compute eigenvalues and sort
 [V, D] = eig(Sw \ Sb);
 [eigenvalues, index] = sort(diag(D), 'descend');
 W_LDA = V(:, index);
 
-% Project data to 2D
+% Get LD1 and LD2 (LDA projection plane)
 LD1 = W_LDA(:, 1);
 LD2 = W_LDA(:, 2);
-X_lda_2D = X * [LD1, LD2];
 
-% Plot 2D data points
-figure; hold on;
-X_LD1 = X_lda_2D(:, 1);
-X_LD2 = X_lda_2D(:, 2);
-s1 = scatter(X_LD1(y == 1), X_LD2(y == 1), 'g', 'filled'); % Rubber
-s2 = scatter(X_LD1(y == 2), X_LD2(y == 2), 'b', 'filled'); % TPU
+% Compute decision boundary (midpoint of class means)
+decision_boundary = (mu1 + mu2) / 2;
 
-% Plot LDA directions (LD1 & LD2) 
-q1 = quiver(mean(X_LD1), mean(X_LD2), LD1(1), LD1(2), 1.5, 'r', 'LineWidth', 2, 'MaxHeadSize', 0.5); % LD1
-q2 = quiver(mean(X_LD1), mean(X_LD2), LD2(1), LD2(2), 1.5, 'm', 'LineWidth', 2, 'MaxHeadSize', 0.5); % LD2
-
-% Plot 2D LDA decision boundary
-decision_boundary = (mu1 + mu2) / 2; % Midpoint between class means
-boundary_slope = -LD1(1) / LD1(2); % Perpendicular slope
-x_vals = linspace(min(X_lda_2D(:, 1)), max(X_lda_2D(:, 1)), 10);
-y_vals = boundary_slope * (x_vals - decision_boundary(1)) + decision_boundary(2);
-decision_boundary_line = plot(x_vals, y_vals, '--k', 'LineWidth', 2); % Black dashed line
-
-% Labels and title
-xlabel('LD1');
-ylabel('LD2');
-xlim([min(X_LD1)-1, max(X_LD1)+1]); % Limit x axis range
-ylim([min(X_LD2)-1, max(X_LD2)+1]); % Limit y axis range
-legend([s1, s2, q1, q2, decision_boundary_line], ...
-       {'Rubber', 'TPU', 'LD1', 'LD2', 'Decision Boundary'}, ...
-       'Location', 'best');
-title('2D LDA Projection with Classification Boundary');
-grid on;
-axis equal;
-hold off;
-
-
-% Create figure for the 3D LDA plane
+% Create figure for the 3D classification plane
 figure; hold on;
 
 % Scatter plot of original 3D data points
 s1 = scatter3(X(y == 1, 1), X(y == 1, 2), X(y == 1, 3), 20, 'g', 'filled'); % Rubber
 s2 = scatter3(X(y == 2, 1), X(y == 2, 2), X(y == 2, 3), 20, 'b', 'filled'); % TPU
 
-% Define the range for the plane in LD1-LD2 space
+% Define the range for the classification plane
 plane_size = 5;
-ld1_range = linspace(-plane_size, plane_size, 10);
-ld2_range = linspace(-plane_size, plane_size, 10);
-[LD1_grid, LD2_grid] = meshgrid(ld1_range, ld2_range);
+x_range = linspace(min(X(:,1)), max(X(:,1)), 10);
+y_range = linspace(min(X(:,2)), max(X(:,2)), 10);
+[X_grid, Y_grid] = meshgrid(x_range, y_range);
 
-% Compute corresponding 3D points for the plane
-X_plane = mu_total(1) + LD1(1) * LD1_grid + LD2(1) * LD2_grid;
-Y_plane = mu_total(2) + LD1(2) * LD1_grid + LD2(2) * LD2_grid;
-Z_plane = mu_total(3) + LD1(3) * LD1_grid + LD2(3) * LD2_grid;
+% Compute classification plane normal (LD1)
+normal = LD1;  % classification is vertical to LD1
 
-% Plot LDA plane using surf()
-lda_plane = surf(X_plane, Y_plane, Z_plane, 'FaceAlpha', 0.5, 'EdgeColor', 'none', 'FaceColor', 'magenta');
+% Compute corresponding Z values for classification plane
+Z_grid = (-normal(1) * (X_grid - decision_boundary(1)) ...
+          - normal(2) * (Y_grid - decision_boundary(2))) / normal(3) ...
+          + decision_boundary(3);
+
+% Plot classification plane using surf()
+classification_plane = surf(X_grid, Y_grid, Z_grid, ...
+                            'FaceAlpha', 0.5, 'EdgeColor', 'none', 'FaceColor', 'cyan');
 
 % Labels and legend
 xlabel('D_X');
 ylabel('D_Y');
 zlabel('D_Z');
-legend([s1, s2, lda_plane], {'Rubber', 'TPU', 'LDA Projection Plane'}, 'Location', 'best');
+legend([s1, s2, classification_plane], {'Rubber', 'TPU', 'Classification Plane'}, 'Location', 'best');
 
 % Set title and grid
-title('3D LDA Projection with Classification Plane');
+title('3D Classification Plane (Decision Boundary)');
 grid on;
 view(3); % 3D view
 axis equal;
