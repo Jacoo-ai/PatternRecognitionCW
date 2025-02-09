@@ -97,8 +97,7 @@ test_labels = labels(test_indices);
 %% Step 4: Train the Model and Visualize 2 Trees
 
 % Train the Random Forest model using the optimal number of trees
-% num_trees = stable_tree_idx;
-num_trees = 2;
+num_trees = stable_tree_idx;
 rf_model = TreeBagger(num_trees, train_data, train_labels, 'OOBPrediction', 'on');
 
 % Extract two decision trees from the trained Random Forest model
