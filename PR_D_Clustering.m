@@ -21,7 +21,7 @@ scatter3(dspm_TPU(:, 13), dspm_TPU(:, 14), dspm_TPU(:, 15), 30, 'b', 'filled');
 xlabel('X-displacement'); ylabel('Y-displacement'); zlabel('Z-displacement');
 % title('Scatter plot of tactile displacements for different materials');
 legend('Normal', 'Rubber', 'TPU');
-grid on; hold off;
+grid on; box on; hold off;
 %%
 % 1.b. Apply k-means clustering
 cluster_colors = [0.8500 0.3250 0.0980;  % Cluster 1 - Red
@@ -35,53 +35,58 @@ figure; hold on;
 % Assign different colors to each cluster for better visualization
 for i = 1:k
     scatter3(dspm_P4(cluster_indices == i, 1), dspm_P4(cluster_indices == i, 2), dspm_P4(cluster_indices == i, 3), ...
-             30, cluster_colors(i, :), 'filled');
+             30, cluster_colors(i, :), 'filled', 'DisplayName', sprintf('Cluster %d', i));
+    scatter3(cluster_centers(i, 1), cluster_centers(i, 2), cluster_centers(i, 3), ...
+             200, cluster_colors(i, :), 'p', 'filled', 'DisplayName', sprintf('Centroid %d', i), 'MarkerEdgeColor', 'k', 'LineWidth', 1.0); 
 end
 hold off;
 
 % Add labels and title
 xlabel('X-displacement'); ylabel('Y-displacement'); zlabel('Z-displacement');
-title('K-means clustering with Euclidean distance metric');
 
 % Add legend for each cluster
-legend('Cluster 1', 'Cluster 2', 'Cluster 3');
+legend('show', 'Location', 'best');
 
 % Adjust view and grid for better 3D effect
 view(3);  % Ensure the view is set to 3D
-grid on;
+grid on; box on;
 %%
 % 1.c. Apply k-means with a different distance metric (e.g., cityblock)
 % L1 distance
 
 % --- Helper function: Map cluster labels to match Euclidean clustering ---
-function mapped_indices = map_clusters(original_centers, new_centers, indices)
+function [mapped_indices, sorted_centers] = map_clusters(original_centers, new_centers, indices)
     % Calculate pairwise distances between original and new centers
     distances = pdist2(original_centers, new_centers);
     % Find the best matching order of clusters
     [~, map] = min(distances, [], 2);
     % Apply the mapping to cluster indices
     mapped_indices = arrayfun(@(x) find(map == x), indices);
+    % Apply the same mapping to cluster centers
+    sorted_centers = new_centers(map, :);
 end
 % --- function end ---
 
 [cluster_indices_L1, cluster_centers_L1] = kmeans(dspm_P4, k, 'Distance', 'cityblock');
-cluster_indices_L1 = map_clusters(cluster_centers, cluster_centers_L1, cluster_indices_L1);
+[cluster_indices_L1, cluster_centers_L1] = map_clusters(cluster_centers, cluster_centers_L1, cluster_indices_L1);
 % Plot clustering result with new distance metric
 figure; hold on;
 % Assign different colors to each cluster for better visualization
 for i = 1:k
     scatter3(dspm_P4(cluster_indices_L1 == i, 1), dspm_P4(cluster_indices_L1 == i, 2), dspm_P4(cluster_indices_L1 == i, 3), ...
-             30, cluster_colors(i, :), 'filled');
+             30, cluster_colors(i, :), 'filled', 'Displayname', sprintf('Cluster %d', i));
+    scatter3(cluster_centers_L1(i, 1), cluster_centers_L1(i, 2), cluster_centers_L1(i, 3), ...
+             200, cluster_colors(i, :), 'p', 'filled', 'DisplayName', sprintf('Centroid %d', i), 'MarkerEdgeColor', 'k', 'LineWidth', 1.0);
 end
+
 hold off;
 
 % Add labels and title
 xlabel('X-displacement'); ylabel('Y-displacement'); zlabel('Z-displacement');
-title('K-means clustering with cityblock distance metric');
 
 % Add legend for each cluster
-legend('Cluster 1', 'Cluster 2', 'Cluster 3');
+legend('show', 'Location', 'best');
 
 % Adjust view and grid for better 3D effect
 view(3);  % Ensure the view is set to 3D
-grid on;
+grid on; box on;
