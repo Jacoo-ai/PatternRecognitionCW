@@ -65,13 +65,13 @@ fprintf('Optimal number of trees after convergence: %d\n', stable_tree_idx);
 figure;
 plot(1:num_trees, mean_oob_error, '-o', 'LineWidth', 1.5);
 xlabel('Number of Trees');
-ylabel('Mean OOB Error (Cross-Validation)');
-title('Out-of-Bag Error vs Number of Trees (Cross-Validation)');
+ylabel('Mean OOB Error');
+title('Out-of-Bag Error vs Number of Trees');
 grid on;
 
 hold on;
 plot(stable_tree_idx, mean_oob_error(stable_tree_idx), 'go', 'MarkerSize', 8, 'LineWidth', 2);
-legend('Mean OOB Error', 'Stable Number of Trees');
+legend('Mean OOB Error', 'Optimal Number of Trees');
 
 
 
@@ -105,14 +105,11 @@ tree1 = rf_model.Trees{1};  % First tree
 tree2 = rf_model.Trees{2};  % Second tree
 
 % Visualize the first decision tree
-figure;
 view(tree1, 'Mode', 'graph'); % 'graph' mode shows a tree diagram
-title('Decision Tree 1');
 
 % Visualize the second decision tree
-figure;
 view(tree2, 'Mode', 'graph'); % 'graph' mode shows a tree diagram
-title('Decision Tree 2');
+
 
 
 %% Step 5: Display Confusion Matrix

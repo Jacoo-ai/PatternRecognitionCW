@@ -1,5 +1,5 @@
 %% Part C a,b - 3D Plot of Tactile Displacement for Different Materials
-
+clear;
 % List of file paths
 mat_files = {
     "Processed_data\Data_for_each_contact\oblong_rubber_papillarray_single.mat", 
@@ -50,7 +50,6 @@ hold off;
 
 
 %% Part C c - Apply LDA to all 2D combinations of D_X, D_Y, and D_Z
-
 % Define 2D feature combinations
 feature_combinations = {[1, 2], [1, 3], [2, 3]};
 feature_labels = {'D_X', 'D_Y', 'D_Z'};

@@ -67,14 +67,11 @@ hold off;
 
 %% Part B 1b
 
-% Create a figure for 2D plots
-figure; hold on;
-
-% Reduce to 2D (PC1 and PC2)
+% Reduce to 2D using first two principal components
 reduced_data = score(:, 1:2);
 
-% Define colors for each material
-colors = {'r', 'g', 'b'}; % Red for normal, Green for rubber, Blue for TPU
+% Replot the standardized data in 2D
+figure; hold on;
 
 % Plot each material separately with different colors
 for i = 1:length(mat_files)
@@ -83,16 +80,23 @@ for i = 1:length(mat_files)
             20, colors{i}, 'filled');
 end
 
-xlabel('PC1');
-ylabel('PC2');
-title('2D PCA Reduction for the Middle Sensor');
+% Plot the principal components as vectors in 2D
+mean_reduced = mean(reduced_data);
+quiver(mean_reduced(1), mean_reduced(2), ...
+       coeff(1, 1), coeff(2, 1), ...
+       5, 'Color', [1 0.5 0], 'LineWidth', 2, 'MaxHeadSize', 0.5); % PC1 (橙色)
+quiver(mean_reduced(1), mean_reduced(2), ...
+       coeff(1, 2), coeff(2, 2), ...
+       5, 'Color', [0.5 0 0.5], 'LineWidth', 2, 'MaxHeadSize', 0.5); % PC2 (紫色)
 
-% Add legend
-legend({'Normal Cylinder', 'Rubber Cylinder', 'TPU Cylinder'}, 'Location', 'Best');
+% Set plot labels, legend, and title
+xlabel('Principal Component 1');
+ylabel('Principal Component 2');
+title('PCA of Standardized Force Data (2D)');
 
+legend({'Normal Cylinder', 'Rubber Cylinder', 'TPU Cylinder', 'PC1', 'PC2'}, 'Location', 'Best');
 grid on;
 hold off;
-
 
 
 
@@ -129,6 +133,7 @@ sgtitle('1D Distribution for the Middle Sensor');
 
 % Add legend
 legend({'Normal Cylinder', 'Rubber Cylinder', 'TPU Cylinder'}, 'Location', 'BestOutside');
+
 
 
 
@@ -225,13 +230,22 @@ for i = 1:length(mat_files)
             20, colors{i}, 'filled');
 end
 
+% Plot the principal components as vectors in 2D
+mean_reduced = mean(reduced_data);
+quiver(mean_reduced(1), mean_reduced(2), ...
+       coeff(1, 1), coeff(2, 1), ...
+       5, 'Color', [1 0.5 0], 'LineWidth', 2, 'MaxHeadSize', 0.5); % PC1 (橙色)
+quiver(mean_reduced(1), mean_reduced(2), ...
+       coeff(1, 2), coeff(2, 2), ...
+       5, 'Color', [0.5 0 0.5], 'LineWidth', 2, 'MaxHeadSize', 0.5); % PC2 (紫色)
+
 % Set labels and title
 xlabel('PC1');
 ylabel('PC2');
 title('2D PCA Reduction for 9 Sensors');
 
 % Add legend
-legend({'Normal Cylinder', 'Rubber Cylinder', 'TPU Cylinder'}, 'Location', 'Best');
+legend({'Normal Cylinder', 'Rubber Cylinder', 'TPU Cylinder', 'PC1', 'PC2'}, 'Location', 'Best');
 
 grid on;
 hold off;
