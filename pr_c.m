@@ -172,64 +172,35 @@ if mean(X_lda_2D(y == 1, 2)) < mean(X_lda_2D(y == 2, 2))
     X_lda_2D(:,2) = -X_lda_2D(:,2);
 end
 
+
 % Plot 2D data points
 figure; hold on;
 X_LD1 = X_lda_2D(:, 1);
 X_LD2 = X_lda_2D(:, 2);
 scatter(X_LD1(y == 1), X_LD2(y == 1), 'g', 'filled'); % Rubber
 scatter(X_LD1(y == 2), X_LD2(y == 2), 'b', 'filled'); % TPU
-
-% Extract LD1 and LD2 components
-LD1_unit = LD1(1:2)'; % Convert to row vector
-LD1_unit = LD1_unit / norm(LD1_unit); % Normalize
-
-LD2_unit = LD2(1:2)'; % Convert to row vector
-LD2_unit = LD2_unit / norm(LD2_unit); % Normalize
-
-% Compute the mean of the projected data
-mu_lda = mean(X_lda_2D, 1);
-
-% Set scale for visualization
-s = 3;
-
-% Compute LD1 and LD2 lines
-P1_LD1 = mu_lda + s * LD1_unit; % Endpoint in one direction
-P2_LD1 = mu_lda - s * LD1_unit; % Endpoint in the opposite direction
-
-P1_LD2 = mu_lda + s * LD2_unit; % Endpoint in one direction
-P2_LD2 = mu_lda - s * LD2_unit; % Endpoint in the opposite direction
-
-% Plot LD1 and LD2 as solid lines
-plot([P1_LD1(1), P2_LD1(1)], [P1_LD1(2), P2_LD1(2)], 'r', 'LineWidth', 2); % LD1 direction
-plot([P1_LD2(1), P2_LD2(1)], [P1_LD2(2), P2_LD2(2)], 'm', 'LineWidth', 2); % LD2 direction
-
-% Projected class means onto LD1
-mu1_proj = mean(X_lda_2D(y == 1, :) * LD1_unit');
-mu2_proj = mean(X_lda_2D(y == 2, :) * LD1_unit');
-
-% Compute decision boundary position (midpoint of projected means)
-decision_boundary_proj = (mu1_proj + mu2_proj) / 2;
-decision_boundary_point = mu_lda + decision_boundary_proj * LD1_unit;
-
-% Compute perpendicular direction to LD1
-LD1_perp = [-LD1_unit(2), LD1_unit(1)];  % Rotate 90 degrees
-
-% Compute endpoints of the decision boundary line
-B1 = decision_boundary_point + s * LD1_perp;
-B2 = decision_boundary_point - s * LD1_perp;
-
-% Plot decision boundary as a dashed black line
-plot([B1(1), B2(1)], [B1(2), B2(2)], 'k--', 'LineWidth', 2);
-
-% Labels and title
 xlabel('LD1');
 ylabel('LD2');
-xlim([min(X_LD1)-1, max(X_LD1)+1]); % Adjust x-axis limits
-ylim([min(X_LD2)-1, max(X_LD2)+1]); % Adjust y-axis limits
-legend({'Rubber', 'TPU', 'LD1', 'LD2', 'Decision Boundary'}, 'Location', 'best');
 title('2D LDA Projection with Decision Boundary');
-grid on;
-axis equal;
+legend({'Rubber', 'TPU'}, 'Location', 'best');
+
+% Fit a linear classifier (LDA Decision Boundary)
+lda_model = fitcdiscr(X_lda_2D, y); % Train LDA classifier
+f = @(x1, x2) lda_model.Coeffs(1,2).Const + ...
+              lda_model.Coeffs(1,2).Linear(1)*x1 + ...
+              lda_model.Coeffs(1,2).Linear(2)*x2;
+
+% Generate grid for decision boundary
+[x1Grid, x2Grid] = meshgrid(linspace(min(X_lda_2D(:,1)), max(X_lda_2D(:,1)), 100), ...
+                            linspace(min(X_lda_2D(:,2)), max(X_lda_2D(:,2)), 100));
+
+% Evaluate the decision function on the grid
+boundary_values = arrayfun(f, x1Grid, x2Grid);
+
+% Plot the decision boundary
+hold on;
+contour(x1Grid, x2Grid, boundary_values, [0 0], 'k--', 'LineWidth', 2);
+legend({'Rubber', 'TPU', 'Decision Boundary'}, 'Location', 'best');
 hold off;
 
 
