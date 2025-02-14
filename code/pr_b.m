@@ -45,11 +45,11 @@ end
 % Plot the principal components as vectors
 mean_force = mean(standardized_forces);
 quiver3(mean_force(1), mean_force(2), mean_force(3), ...
-        coeff(1, 1), coeff(2, 1), coeff(3, 1), 5, 'Color', [1 0.5 0], 'LineWidth', 2, 'MaxHeadSize', 0.5); % PC1 (橙色)
+        coeff(1, 1), coeff(2, 1), coeff(3, 1), 5, 'Color', [1 0.5 0], 'LineWidth', 2, 'MaxHeadSize', 0.5); % PC1 (orange)
 quiver3(mean_force(1), mean_force(2), mean_force(3), ...
-        coeff(1, 2), coeff(2, 2), coeff(3, 2), 5, 'Color', [0.5 0 0.5], 'LineWidth', 2, 'MaxHeadSize', 0.5); % PC2 (紫色)
+        coeff(1, 2), coeff(2, 2), coeff(3, 2), 5, 'Color', [0.5 0 0.5], 'LineWidth', 2, 'MaxHeadSize', 0.5); % PC2 (purple)
 quiver3(mean_force(1), mean_force(2), mean_force(3), ...
-        coeff(1, 3), coeff(2, 3), coeff(3, 3), 5, 'Color', [0 0.75 0.75], 'LineWidth', 2, 'MaxHeadSize', 0.5); % PC3 (青色)
+        coeff(1, 3), coeff(2, 3), coeff(3, 3), 5, 'Color', [0 0.75 0.75], 'LineWidth', 2, 'MaxHeadSize', 0.5); % PC3 (cyan)
 
 % Set plot labels, legend, and title
 xlabel('Standardised Force X');
@@ -80,21 +80,12 @@ for i = 1:length(mat_files)
             20, colors{i}, 'filled');
 end
 
-% Plot the principal components as vectors in 2D
-mean_reduced = mean(reduced_data);
-quiver(mean_reduced(1), mean_reduced(2), ...
-       coeff(1, 1), coeff(2, 1), ...
-       5, 'Color', [1 0.5 0], 'LineWidth', 2, 'MaxHeadSize', 0.5); % PC1 (橙色)
-quiver(mean_reduced(1), mean_reduced(2), ...
-       coeff(1, 2), coeff(2, 2), ...
-       5, 'Color', [0.5 0 0.5], 'LineWidth', 2, 'MaxHeadSize', 0.5); % PC2 (紫色)
-
 % Set plot labels, legend, and title
-xlabel('Principal Component 1');
-ylabel('Principal Component 2');
+xlabel('PC1');
+ylabel('PC2');
 title('PCA of Standardized Force Data (2D)');
 
-legend({'Normal Cylinder', 'Rubber Cylinder', 'TPU Cylinder', 'PC1', 'PC2'}, 'Location', 'Best');
+legend({'Normal Cylinder', 'Rubber Cylinder', 'TPU Cylinder'}, 'Location', 'Best');
 grid on; box on;
 hold off;
 
@@ -232,15 +223,6 @@ for i = 1:length(mat_files)
             reduced_data(force_labels == i, 2), ...
             20, colors{i}, 'filled');
 end
-
-% Plot the principal components as vectors in 2D
-mean_reduced = mean(reduced_data);
-quiver(mean_reduced(1), mean_reduced(2), ...
-       coeff(1, 1), coeff(2, 1), ...
-       5, 'Color', [1 0.5 0], 'LineWidth', 2, 'MaxHeadSize', 0.5); % PC1 (橙色)
-quiver(mean_reduced(1), mean_reduced(2), ...
-       coeff(1, 2), coeff(2, 2), ...
-       5, 'Color', [0.5 0 0.5], 'LineWidth', 2, 'MaxHeadSize', 0.5); % PC2 (紫色)
 
 % Set labels and title
 xlabel('PC1');
