@@ -1,5 +1,4 @@
 %% Part A 1
-clc; clear; close all;
 % List of file paths
 mat_files = {
     "PR_CW_mat\cylinder_papillarray_single.mat", 
@@ -145,6 +144,7 @@ colors = {'r', 'g', 'b'}; % Red for normal, Green for rubber, Blue for TPU
 figure;
 hold on;
 grid on;
+box on;
 
 % Iterate through each file
 for i = 1:length(mat_files)
