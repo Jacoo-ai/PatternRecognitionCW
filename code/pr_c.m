@@ -146,7 +146,7 @@ X = all_displacements;  % Feature matrix (D_X, D_Y, D_Z)
 y = displacement_labels;  % Class labels (1 for Rubber, 2 for TPU)
 
 % Standardization
-X = (X - mean(X)) ./ std(X); 
+X = (X - mean(X)) ./ std(X);
 
 % Calculate means
 mu1 = mean(X(y == 1, :), 1);
@@ -157,7 +157,7 @@ mu_total = mean(X, 1);
 Sw = cov(X(y == 1, :)) + cov(X(y == 2, :));
 Sb = (mu1 - mu_total)' * (mu1 - mu_total) + (mu2 - mu_total)' * (mu2 - mu_total);
 
-% Calcualte eigenvalues and sort
+% Calculate eigenvalues and sort
 [V, D] = eig(Sw \ Sb);
 [eigenvalues, index] = sort(diag(D), 'descend');
 W_LDA = V(:, index);
@@ -167,7 +167,7 @@ LD1 = W_LDA(:, 1);
 LD2 = W_LDA(:, 2);
 X_lda_2D = X * [LD1, LD2];
 
-% Ensure projected data don't flip because of the direction of the eigen vector
+% Ensure projected data consistency
 if mean(X_lda_2D(y == 1, 1)) > mean(X_lda_2D(y == 2, 1))
     W_LDA(:,1) = -W_LDA(:,1);
     X_lda_2D(:,1) = -X_lda_2D(:,1);
@@ -177,65 +177,42 @@ if mean(X_lda_2D(y == 1, 2)) < mean(X_lda_2D(y == 2, 2))
     X_lda_2D(:,2) = -X_lda_2D(:,2);
 end
 
+% Compute exact rotation angle to align LD1 horizontally
+theta = atan2(LD1(2), LD1(1));  % Compute rotation angle from LD1 direction
+R = [cos(-theta), -sin(-theta); sin(-theta), cos(-theta)];  % Rotation matrix
+X_lda_2D = X_lda_2D * R';
+
 % Plot 2D data points
 figure; hold on;
+xlim([-3 3]);
+ylim([-3 3]);
 X_LD1 = X_lda_2D(:, 1);
 X_LD2 = X_lda_2D(:, 2);
 scatter(X_LD1(y == 1), X_LD2(y == 1), 'g', 'filled'); % Rubber
 scatter(X_LD1(y == 2), X_LD2(y == 2), 'b', 'filled'); % TPU
 
-% Extract LD1 and LD2 components
-LD1_unit = LD1(1:2)'; % Convert to row vector
-LD1_unit = LD1_unit / norm(LD1_unit); % Normalize
+% Compute class means in rotated space
+mu1_proj = mean(X_lda_2D(y == 1, :), 1);
+mu2_proj = mean(X_lda_2D(y == 2, :), 1);
 
-LD2_unit = LD2(1:2)'; % Convert to row vector
-LD2_unit = LD2_unit / norm(LD2_unit); % Normalize
-
-% Compute the mean of the projected data
-mu_lda = mean(X_lda_2D, 1);
-
-% Set scale for visualization
-s = 3;
-
-% Compute LD1 and LD2 lines
-P1_LD1 = mu_lda + s * LD1_unit; % Endpoint in one direction
-P2_LD1 = mu_lda - s * LD1_unit; % Endpoint in the opposite direction
-
-P1_LD2 = mu_lda + s * LD2_unit; % Endpoint in one direction
-P2_LD2 = mu_lda - s * LD2_unit; % Endpoint in the opposite direction
-
-% Plot LD1 and LD2 as solid lines
-plot([P1_LD1(1), P2_LD1(1)], [P1_LD1(2), P2_LD1(2)], 'r', 'LineWidth', 1); % LD1 direction
-plot([P1_LD2(1), P2_LD2(1)], [P1_LD2(2), P2_LD2(2)], 'm', 'LineWidth', 1); % LD2 direction
-
-% Projected class means onto LD1
-mu1_proj = mean(X_lda_2D(y == 1, :) * LD1_unit');
-mu2_proj = mean(X_lda_2D(y == 2, :) * LD1_unit');
-
-% Compute decision boundary position (midpoint of projected means)
+% Compute decision boundary (midpoint of means)
 decision_boundary_proj = (mu1_proj + mu2_proj) / 2;
-decision_boundary_point = mu_lda + decision_boundary_proj * LD1_unit;
 
-% Compute perpendicular direction to LD1
-LD1_perp = [-LD1_unit(2), LD1_unit(1)];  % Rotate 90 degrees
+% Decision boundary should be vertical (constant X value)
+x_decision = decision_boundary_proj(1);
 
-% Compute endpoints of the decision boundary line
-B1 = decision_boundary_point + s * LD1_perp;
-B2 = decision_boundary_point - s * LD1_perp;
-
-% Plot decision boundary as a dashed black line
-plot([B1(1), B2(1)], [B1(2), B2(2)], 'k--', 'LineWidth', 1);
+% **Extend the decision boundary beyond the current ylim**
+ylimits = ylim;  % Get current y-axis limits
+plot([x_decision, x_decision], [ylimits(1) - 1, ylimits(2) + 1], 'k--', 'LineWidth', 1);
 
 % Labels and title
 xlabel('LD1');
 ylabel('LD2');
-xlim([-3 3]);
-ylim([-3 3]);
-legend({'Rubber', 'TPU', 'LD1', 'LD2', 'Decision Boundary'}, 'Location', 'best');
-title('2D LDA Projection with Decision Boundary');
+legend({'Rubber', 'TPU', 'Decision Boundary'}, 'Location', 'best');
+title('2D LDA Projection with Extended Decision Boundary');
 grid on; box on;
-% axis equal;
 hold off;
+
 
 
 
