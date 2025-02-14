@@ -230,7 +230,7 @@ ylabel('PC2');
 title('2D PCA Reduction for 9 Sensors');
 
 % Add legend
-legend({'Normal Cylinder', 'Rubber Cylinder', 'TPU Cylinder', 'PC1', 'PC2'}, 'Location', 'Best');
+legend({'Normal Cylinder', 'Rubber Cylinder', 'TPU Cylinder'}, 'Location', 'Best');
 
 grid on; box on;
 hold off;
